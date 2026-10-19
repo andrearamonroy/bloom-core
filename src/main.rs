@@ -23,14 +23,24 @@ fn days_until_next(cycle_length: i64, cycle_day: i64) -> i64 {
     cycle_length - cycle_day
 }
 
-fn average_ cycle(periods: &Vec<Period>) -> i64 {
+fn average_cycle(periods: &Vec<Period>) -> i64 {
      let mut total = 0;
      
      for i in 1..periods.len(){
         let gap = (periods[i].start - periods[i - 1].start).num_days();
         total += gap;
+        println!("i = {i}: {} → {} = {gap} days, total so far = {total}", periods[i - 1].start, periods[i].start);
      }
      total / (periods.len() as i64 - 1)
+}
+
+fn average_length(periods : &Vec<Period>) -> i64 {
+    //average length of a period
+    let mut total = 0;
+    for p in periods {
+        total = p.length()
+    }
+    total / periods.len() as i64
 }
 
 fn main() {
@@ -50,6 +60,18 @@ fn main() {
     for p in &periods {
         println!(" {} -> {} ({} days)", p.start, p.end, p.length());
     }
+
+    let cycle = average_cycle(&periods);
+    let last = periods.last().unwrap();
+    let next_start = last.start + Duration::days(cycle);
+    let today = Local::now().date_naive();
+    let days_left = (next_start - today).num_days();
+
+    let period_length = average_length(&periods);
+    println!("Your average period lenght is {period_length} days");
+
+    println!("Your average cycle: {cycle} days");
+    println!("Next period {}", next_start.format("%A, %B %-d"));
 
     //naiveDate is a type from the chrono library that holds just the calendar date
     //year,month,day- no time or timezone that's why its called naive
